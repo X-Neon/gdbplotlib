@@ -10,7 +10,7 @@ setuptools.setup(
     author_email='gcholerton@gmail.com',
     url='https://github.com/X-Neon/gdbplotlib',
     packages=setuptools.find_packages(),
-    install_requires=['numpy'],
+    install_requires=['numpy', 'matplotlib'],
     python_requires='>=3',
     description='Plotting and exporting of variables from GDB',
     long_description=long_description,
