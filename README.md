@@ -80,7 +80,7 @@ plot x[:3]
 ```
 ![Image](./images/example_2.png)
 
-Pointers are an example of an unbounded type - that is a type for which it is not possible to deduce the number of elements. In order to correctly plot the variable `y`, the user must explicitely give an endpoint using the slice syntax:
+Pointers are an example of an unbounded type - that is a type for which it is not possible to deduce the number of elements. In order to correctly plot the variable `y`, the user must explicitily give an endpoint using the slice syntax:
 
 ```
 plot y[:100]
