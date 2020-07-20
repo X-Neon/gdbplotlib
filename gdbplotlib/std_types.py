@@ -13,7 +13,7 @@ COMPLEX_REGEX = re.compile("(\\S*) \\+ (\\S*) \\* I")
 class StdVector(TypeHandler):
     @staticmethod
     def can_handle(gdb_type: gdb.Type) -> bool:
-        return str(gdb_type).startswith("std::vector")
+        return str(gdb_type).startswith("std::vector") and str(gdb_type.template_argument(0)) != "bool"
 
     def shape(self, gdb_value: gdb.Value) -> Tuple[Optional[int], ...]:
         size = int(gdb_value["_M_impl"]["_M_finish"] - gdb_value["_M_impl"]["_M_start"])
@@ -24,6 +24,29 @@ class StdVector(TypeHandler):
 
     def extract(self, gdb_value: gdb.Value, index: Tuple[int, ...]):
         return (gdb_value["_M_impl"]["_M_start"] + index[0]).dereference()
+
+
+class StdVectorBool(TypeHandler):
+    @staticmethod
+    def can_handle(gdb_type: gdb.Type) -> bool:
+        return str(gdb_type).startswith("std::vector") and str(gdb_type.template_argument(0)) == "bool"
+
+    def shape(self, gdb_value: gdb.Value) -> Tuple[Optional[int], ...]:
+        base_size = int(gdb_value["_M_impl"]["_M_finish"]["_M_p"] - gdb_value["_M_impl"]["_M_start"]["_M_p"])
+        size = 64 * base_size + int(gdb_value["_M_impl"]["_M_finish"]["_M_offset"])
+        print(size)
+        return (size,)
+
+    def contained_type(self, gdb_value: gdb.Value) -> gdb.Type:
+        return gdb_value.type.template_argument(0)
+
+    def extract(self, gdb_value: gdb.Value, index: Tuple[int, ...]):
+        container_index = index[0]//64
+        offset = index[0] % 64
+        b64 = int((gdb_value["_M_impl"]["_M_start"]["_M_p"] + container_index).dereference())
+        value = bool(b64 & (1 << offset))
+
+        return gdb.Value(value)
 
 
 class StdArray(TypeHandler):
@@ -63,7 +86,7 @@ class Array(TypeHandler):
         return gdb_type.code == gdb.TYPE_CODE_ARRAY
 
     def shape(self, gdb_value: gdb.Value) -> Tuple[Optional[int], ...]:
-        size = gdb_value.type.range()[1]
+        size = gdb_value.type.range()[1] + 1
         return (size, )
 
     def contained_type(self, gdb_value: gdb.Value) -> Optional[gdb.Type]:
@@ -144,3 +167,12 @@ class Integral(ScalarTypeHandler):
 
     def extract(self, gdb_value: gdb.Value, index: Tuple[int, ...]):
         return self.np_dtype.type(gdb_value)
+
+
+class Bool(ScalarTypeHandler):
+    @staticmethod
+    def can_handle(gdb_type: gdb.Type) -> bool:
+        return str(gdb_type) == "bool"
+
+    def extract(self, gdb_value: gdb.Value, index: Tuple[int, ...]):
+        return np.bool(gdb_value)
