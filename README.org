@@ -35,7 +35,6 @@ savepy foo_pickle arr2d
 
 Other commands (plot3d, scatter, scatter3d, hist) from https://github.com/X-Neon/gdbplotlib may work but have not yet been tested.
 
-
 ** Supported types
 
 #+BEGIN_SRC f90 :exports both
@@ -44,6 +43,15 @@ real*8, dimension(:,:)
 integer*4, dimension(:)
 integer*8, dimension(:,:)
 #+END_SRC
+
+Note: If gdb reports
+
+#+BEGIN_EXAMPLE
+(gdb) ptype focean
+type = real(kind=8), allocatable (72,0:47)
+#+END_EXAMPLE
+
+Then you need to use the syntax =plotim focean(:,:)=
 
 * Install
 
