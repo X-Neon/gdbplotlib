@@ -116,6 +116,7 @@ class Imshow(gdb.Command):
         nx = img.shape
         ax.imshow(img,
                   extent=(0.5, nx[0]+0.5, 0.5, nx[1]+0.5),
+                  origin='lower',
                   interpolation='none')
         plt.show()
 
