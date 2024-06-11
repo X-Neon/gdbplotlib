@@ -115,7 +115,7 @@ class Imshow(gdb.Command):
         ax = fig.add_subplot(111)
         nx = img.shape
         ax.imshow(img,
-                  extent=(0.5, nx[0]+0.5, 0.5, nx[1]+0.5),
+                  extent=(0.5, nx[1]+0.5, 0.5, nx[0]+0.5),
                   origin='lower',
                   interpolation='none')
         plt.show()
