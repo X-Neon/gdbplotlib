@@ -1,3 +1,8 @@
+
+# Fortran support
+
+See my `fortran` branch at https://github.com/mankoff/gdbplotlib/tree/fortran to use `gdbplotlib` with Fortran.
+
 # GDBplotlib
 
 GDBplotlib is an extension to GDB which enables easy visualisation and exporting of data structures. The current implementation is focused on C++, although it could theoretically be extended to work with any language supported by GDB.
