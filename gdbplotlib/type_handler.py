@@ -78,7 +78,7 @@ class TypeHandler(ABC):
         scalar_type = (contained_type == None)
 
         if scalar_type:
-            return self.extract(gdb_value, None)
+            return self.extract(gdb_value, shape)
 
         basic_contained_type = gdb.types.get_basic_type(contained_type)
         contained_handler = self.type_set.get_handler(basic_contained_type)

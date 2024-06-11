@@ -2,6 +2,7 @@ from .type_set import TypeSet
 from . import std_types
 
 default = TypeSet()
+default.register(std_types.FortranArray)
 default.register(std_types.StdVector)
 default.register(std_types.StdVectorBool)
 default.register(std_types.StdArray)

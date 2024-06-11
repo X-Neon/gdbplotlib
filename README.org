@@ -1,0 +1,140 @@
+
+* GDBplotlib
+
+* Table of contents                               :toc_3:noexport:
+- [[#gdbplotlib][GDBplotlib]]
+- [[#introduction][Introduction]]
+  - [[#supported-commands][Supported commands]]
+  - [[#supported-types][Supported types]]
+- [[#install][Install]]
+- [[#usage-example][Usage example]]
+- [[#requirements][Requirements]]
+- [[#acknowledgements][Acknowledgements]]
+
+* Introduction
+
+This is a fork of https://github.com/X-Neon/gdbplotlib that supports plotting Fortran arrays from inside gdb. See [[./README_orig.md]] for the original README file.
+
+
+** Supported commands
+
+#+BEGIN_SRC bash :exports both :results verbatim
+plot vec1d # line plot of 1D
+plot vec1d(2:3) # subset
+
+plot arr2d # line plots of each row of 2D data
+plot arr2d(:,1)
+
+plotim arr2d # imshow 2D map view
+
+fft vec1d # FFT of vector
+
+savepy foo_pickle arr2d
+# with open('foo_pickle', 'rb') as file: data = pickle.load(file)
+#+END_SRC
+
+Other commands (plot3d, scatter, scatter3d, hist) from https://github.com/X-Neon/gdbplotlib may work but have not yet been tested.
+
+
+** Supported types
+
+#+BEGIN_SRC f90 :exports both
+real*4, dimension(:)
+real*8, dimension(:,:)
+integer*4, dimension(:)
+integer*8, dimension(:,:)
+#+END_SRC
+
+* Install
+
+Install the =fortran= fork with
+
+#+BEGIN_SRC bash :exports both :results verbatim
+git clone -b fortran https://github.com/mankoff/gdbplotlib
+#+END_SRC
+
+Set an environment variable to that location (perhaps in your =.bashrc= or other init script).
+
+#+BEGIN_SRC bash :exports both :results verbatim
+export GDBPLOTLIB_DIR=/path/to/gdbplotlib
+#+END_SRC
+
+Edit your =~/.gdbinit= file to load =gdbplotlib=
+
+#+BEGIN_SRC python
+python
+import os
+import sys
+gpl_dir = 'GDBPLOTLIB_DIR'
+if gpl_dir not in os.environ:
+   print(f'WARNING: environmental var {gpl_dir} not found')
+else:
+    sys.path.insert(0, os.path.expanduser(os.environ[gpl_dir]))
+    try:
+       import gdbplotlib
+    except:
+       print("WARNING: Could not import gdbplotlib")   
+end
+#+END_SRC
+
+* Usage example
+
+With the following code in =example.F90=
+
+#+BEGIN_SRC f90 :exports both :tangle example.F90
+program main
+  real, allocatable, DIMENSION(:) :: vec1d
+  real, allocatable, DIMENSION(:,:) :: arr2d
+  INTEGER :: im, jm, i,j
+
+  im = 5
+  jm = 4
+  
+  allocate(vec1d(im))
+  allocate(arr2d(im,jm))
+
+  do i=1,im
+     vec1d(i) = i*i
+     do j=1,jm
+        arr2d(i,j) = i*j
+     end do
+  end do
+  
+  print *, vec1d
+  print *, arr2d
+end program main
+#+END_SRC
+
+Compile it for debugging with
+
+#+BEGIN_SRC bash :exports both :results verbatim
+gfortran -g example.F90
+#+END_SRC
+
+Run gdb:
+
+#+BEGIN_SRC bash :exports both :results verbatim
+gdb ./a.out << EOF
+  start
+  break 19
+  continue
+  plot vec1d
+  plotim arr2d
+EOF
+#+END_SRC
+
+
+* Requirements
+
+- GDB >= 7.0
+- Python 3
+- NumPy
+- Matplotlib
+
+* Acknowledgements
+:PROPERTIES:
+:CUSTOM_ID: acknowledgements
+:END:
+
+Thanks to [[https://github.com/X-Neon][X-Neon]] whose [[https://github.com/X-Neon/gdbplotlib][gdbplotlib]] provided the basis and included good documentation for how to customize this for other data types, such as Fortran.
+

@@ -29,7 +29,10 @@ def plot_1d(args, plot_function):
 
         if data.ndim == 2 and not np.iscomplexobj(data):
             for i, row in enumerate(data):
-                plot_function(row)
+                nx = row[1:].size
+                plot_function(np.arange(nx+1)+1,
+                              row,
+                              drawstyle='steps-mid')
                 legend.add(f"{arg}[{i}]")
         elif data.ndim == 1:
             if np.iscomplexobj(data):
@@ -40,7 +43,10 @@ def plot_1d(args, plot_function):
                 legend.add(f"imag({arg})")
                 legend.add(f"abs({arg})")
             else:
-                plot_function(data)
+                nx = data.size
+                plot_function(np.arange(nx)+1,
+                              data,
+                              drawstyle='steps-mid')
                 legend.add(arg)
         else:
             raise PlottingError(f"Unsuitable for plotting: {arg}")
@@ -97,6 +103,24 @@ class Scatter(gdb.Command):
         plt.show()
 
 
+class Imshow(gdb.Command):
+    def __init__(self):
+        super(Imshow, self).__init__("plotim", gdb.COMMAND_OBSCURE)
+
+    def invoke(self, args, from_tty):
+        img = data_extractor.extract_var(args)
+        if img.ndim != 2:
+            raise PlottingError(f"Unsuitable for imshow: {args}")
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        nx = img.shape
+        ax.imshow(img,
+                  extent=(0.5, nx[0]+0.5, 0.5, nx[1]+0.5),
+                  interpolation='none')
+        plt.show()
+
+
+        
 class Plot3D(gdb.Command):
     def __init__(self):
         super(Plot3D, self).__init__("plot3d", gdb.COMMAND_OBSCURE)
@@ -179,7 +203,7 @@ class FFT(gdb.Command):
                     plt.plot(fft_db(row))
                     legend.add(f"{arg}[{i}]")
             elif data.ndim == 1:
-                plt.plot(fft_db(data))
+                plt.plot(fft_db(data), drawstyle='steps-mid')
                 legend.add(arg)
             else:
                 raise PlottingError(f"Unsuitable for plotting: {arg}")
@@ -191,6 +215,7 @@ class FFT(gdb.Command):
 
 
 Plot()
+Imshow()
 Scatter()
 Plot3D()
 Scatter3D()

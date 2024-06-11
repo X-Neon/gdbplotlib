@@ -176,3 +176,41 @@ class Bool(ScalarTypeHandler):
 
     def extract(self, gdb_value: gdb.Value, index: Tuple[int, ...]):
         return np.bool(gdb_value)
+
+
+class FortranArray(TypeHandler):
+    @staticmethod
+    def can_handle(gdb_type: gdb.Type) -> bool:
+        return np.any(
+            [_ in str(gdb_type) for _ in 
+             ["real(kind=4)", "real(kind=8)",
+              "integer(kind=4)", "integer(kind=4)"]
+             ])
+
+    def shape(self, gdb_value: gdb.Value) -> Tuple[Optional[int], ...]:
+        dims = (str(gdb_value.type).split(' ')[-1])[1:-1]
+        shape = np.array(dims.split(',')).astype(int)
+        return shape
+
+    def contained_type(self, gdb_value: gdb.Value) -> Optional[gdb.Type]:
+        dtype = str(gdb.types.get_basic_type(gdb_value.type))
+        if "kind=4" in dtype:
+            size = "f4"
+        elif "kind=8" in dtype:
+            size = "f8"
+        else:
+            size = "f4"
+
+        self.np_dtype = np.dtype(size)
+        return None
+
+    def extract(self, gdb_value: gdb.Value, index: Tuple[int, ...]):
+        if np.shape(index)[0] == 1:
+            arr = np.array([gdb_value[i] for i in range(index[0])])
+        if np.shape(index)[0] == 2:
+            arr = np.zeros(index).T
+            for i in range(index[0]):
+                for j in range(index[1]):
+                    arr[j,i] = gdb_value[j+1][i+1]
+        return arr.astype(self.np_dtype.type)
+
