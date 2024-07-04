@@ -1,9 +1,8 @@
 # GDBplotlib
 
-GDBplotlib is an extension to GDB which enables easy visualisation and exporting of data structures. The current implementation is focused on C++, although it could theoretically be extended to work with any language supported by GDB.
+GDBplotlib is an extension to GDB which enables easy visualisation and exporting of data structures. The current implementation is focused on C++, although it could theoretically be extended to work with any language supported by GDB. [Ken Mankoff](https://github.com/mankoff) has created a fork that adds Fortan support, which can be found [here](https://github.com/mankoff/gdbplotlib/tree/fortran).
 
 ## Features
-
 
 * Many different visualisations, such as line graphs, scatter plots and histograms
 * Exporting of variables in `.mat`, Python pickle and binary formats
