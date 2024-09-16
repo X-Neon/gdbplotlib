@@ -7,7 +7,7 @@ import numpy as np
 
 from .type_handler import TypeHandler, ScalarTypeHandler
 
-COMPLEX_REGEX = re.compile("(\\S*) \\+ (\\S*) \\* I")
+COMPLEX_REGEX = re.compile("(\\S*) . (\\S*)i")
 
 
 class StdVector(TypeHandler):
