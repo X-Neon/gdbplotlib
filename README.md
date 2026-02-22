@@ -111,7 +111,7 @@ plot3d z[::-1,2,4:8]
 * `scatter VAR...` - Create a 2D scatter plot of `VAR`, where `VAR` is either a 1D complex-valued structure, an N-by-2 real-valued structure, or two 1D real-valued structures
 * `scatter3d VAR...` - Create a 3D scatter plot of `VAR`, where `VAR` is either an N-by-3 real-valued structure, or three 1D real-valued structures
 * `hist VAR...` - Create a histogram plot of `VAR`, where `VAR` is any 1D or 2D structure
-* `fft VAR...` - Create a power spectral density plot of `VAR`, where `VAR` is any 1D structure
+* `psd VAR...` - Create a power spectral density plot of `VAR`, where `VAR` is any 1D structure
 * `save FILE VAR` - Save `VAR` to the file `FILE` in binary format
 * `savepy FILE VAR` - Save `VAR` to the file `FILE` in Python pickle format
 * `savemat FILE VAR...` - Save `VAR` to the file `FILE` in Matlab format

@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gdbplotlib"
+version = "0.4.0"
+authors = [
+    { name="George Cholerton", email="gcholerton@gmail.com" },
+]
+description = "Plotting and exporting of variables from GDB"
+readme = "README.md"
+requires-python = ">=3.5"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Software Development :: Debuggers"
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+dependencies = [
+    "numpy",
+    "matplotlib"
+]
+
+[project.optional-dependencies]
+psd = ["scipy"]
+
+[project.urls]
+Homepage = "https://github.com/X-Neon/gdbplotlib"
+

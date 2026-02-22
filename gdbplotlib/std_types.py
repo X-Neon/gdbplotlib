@@ -65,6 +65,26 @@ class StdArray(TypeHandler):
         return gdb_value["_M_elems"][index[0]]
 
 
+class StdSpan(TypeHandler):
+    @staticmethod
+    def can_handle(gdb_type: gdb.Type) -> bool:
+        return str(gdb_type).startswith("std::span")
+
+    def shape(self, gdb_value: gdb.Value) -> Tuple[Optional[int], ...]:
+        static_size = int(gdb_value.type.template_argument(1))
+        if static_size == (1 << 64) - 1:
+            dynamic_size = int(gdb_value["_M_extent"]["_M_extent_value"])
+            return (dynamic_size,)
+        else:
+            return (static_size,)
+
+    def contained_type(self, gdb_value: gdb.Value) -> Optional[gdb.Type]:
+        return gdb_value.type.template_argument(0)
+
+    def extract(self, gdb_value: gdb.Value, index: Tuple[int, ...]):
+        return gdb_value["_M_ptr"][index[0]]
+
+
 class Pointer(TypeHandler):
     @staticmethod
     def can_handle(gdb_type: gdb.Type) -> bool:

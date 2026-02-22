@@ -5,6 +5,12 @@ import numpy as np
 
 from . import data_extractor
 
+try:
+    import scipy.signal
+    SCIPY_AVAILABLE = True
+except ImportError:
+    SCIPY_AVAILABLE = False
+
 
 class PlottingError(Exception):
     pass
@@ -163,29 +169,31 @@ class Hist(gdb.Command):
         plot_1d(args, hist)
 
 
-class FFT(gdb.Command):
+class PSD(gdb.Command):
     def __init__(self):
-        super(FFT, self).__init__("fft", gdb.COMMAND_OBSCURE)
+        super(PSD, self).__init__("psd", gdb.COMMAND_OBSCURE)
 
     def invoke(self, args, from_tty):
+        if not SCIPY_AVAILABLE:
+            raise RuntimeError("Scipy not available")
+
         legend = Legend()
-        fft_db = lambda x: 20*np.log10(np.abs(np.fft.fft(x)))
 
         for arg in args.split():
             data = data_extractor.extract_var(arg)
 
-            if data.ndim == 2 and not np.iscomplexobj(data):
-                for i, row in enumerate(data):
-                    plt.plot(fft_db(row))
-                    legend.add(f"{arg}[{i}]")
-            elif data.ndim == 1:
-                plt.plot(fft_db(data))
-                legend.add(arg)
-            else:
+            if data.ndim != 1:
                 raise PlottingError(f"Unsuitable for plotting: {arg}")
 
+            power, freq = scipy.signal.welch(data, fs=1.0, return_onesided=False)
+            power = np.fft.fftshift(power)
+            freq = np.fft.fftshift(freq)
+            plt.plot(freq, 10 * np.log10(power))
+            legend.add(arg)
+                
         legend.apply()
         plt.grid()
+        plt.ylabel("Frequency")
         plt.ylabel("PSD (dB)")
         plt.show()
 
@@ -195,4 +203,4 @@ Scatter()
 Plot3D()
 Scatter3D()
 Hist()
-FFT()
+PSD()
